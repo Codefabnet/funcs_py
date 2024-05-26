@@ -1,0 +1,185 @@
+import os
+import sys
+import fparse
+
+subcall = fparse.subcall
+getfuncs = fparse.getfuncs
+finduse = fparse.finduse
+listref = fparse.listref
+findinsym = fparse.findinsym
+
+inop = 2 
+infile = ""
+
+if len(sys.argv) > 1:
+    instr = sys.argv[1:2][0]
+    if instr.isdigit():
+        inop = int(instr)
+    else:
+        infile = instr
+#    inop = int(sys.argv[1:2][0])
+
+if len(sys.argv) > 2:
+    instr = sys.argv[2:3][0]
+    if instr.isdigit():
+        inop = int(instr)
+    else:
+        infile = instr
+
+
+
+ctype = 0
+htype = 4
+stype = 8
+diagsonly = 2
+nodiags = 3
+
+def parsemake(ffile):
+
+    srcfile = ""
+    line = ffile.readline()
+    if line.find('SRC_FILES', 0, len('SRC_FILES')) != -1:
+        srcfile = line.split()[-1:][0]
+        srcfile = srcfile.split('$')[-1:][0]
+        srcfile = srcfile.replace('(PACKAGES_DIR)', 'packages')
+        srcfile = srcfile.replace('(CHIP_BSP_FOLDER)', 'bsp/einstein_2')
+    return srcfile
+
+def parsefile(srcfile, count):
+#    print 'getfiles.py, parsefile', srcfile
+    A = getfuncs(srcfile, 0, 1)
+    R = list()
+    for z in A:
+#        print 'getfiles.py, parsefile', z
+        B = finduse(z[0], nodiags)
+#        print 'getfiles.py, parsefile', len(B)
+        if inop > len(B):
+            SymObjs = findinsym(z[0])
+            for y in B[:]:
+#                print 'getfiles.py, parsefile', y
+                if y[0] == srcfile and y[1] == z[2]:
+                    print count, '\t: ', z[0], '\t- ', srcfile, '+'+y[1]
+                    R.append(":split " + srcfile + ' | :' + y[1])
+                    count = count + 1
+#                    if y[2].strip()[-1:] == '{':
+#                        print z[0]
+                else:
+                    print '\tC ', z[0], y[0], y[1], y[2]
+            B = finduse(z[0], diagsonly)
+            for y in B[:]:
+                print '\tD ', y[0], y[1]
+            B = finduse(z[0], htype)
+            for y in B[:]:
+                print '\tH ', y[0], '+'+y[1], '\t', y[2]
+            B = finduse(z[0], stype)
+            for y in B[:]:
+                print '\tS ', y[0], y[1], '\t', y[2].strip()
+            if len(SymObjs) > 0:
+                for y in SymObjs[:]:
+                    print '\t', y
+
+    return R
+
+dir_defs = {"SOFTWARE_DIR":"."}                    
+def find_definition_in_makefile(make_file, find_key):
+
+    # scsn each line of the makefile
+    make_file.seek(0,0)
+    make_line = make_file.readline()
+    while make_line:
+
+        # look for the current dir reference
+        if find_key == make_line[:len(find_key)]:
+
+            # add the definition as a value for the top level dir reference
+            val = make_line.split()[-1:][0]
+            print "found", val
+#            dir_defs[find_key] = val
+            if "$" in val:
+                new_key = val.split(")")[:1][0][2:]
+                if new_key in dir_defs and dir_defs[new_key] != "" and not "$" in dir_defs[new_key]:
+                    new_val = val.replace('$(' + new_key + ')', dir_defs[new_key])
+#                    new_val = dir_defs[find_key].replace('$(' + new_key + ')', dir_defs[new_key])
+#                    dir_defs[find_key] = new_val
+                else:
+                    new_val = find_definition_in_makefile(make_file, new_key)
+                    new_val = val.replace('$(' + new_key + ')', new_val)
+#                    new_val = dir_defs[find_key].replace('$(' + new_key + ')', new_val)
+#                    dir_defs[find_key] = new_val
+                print new_key, new_val
+                val = new_val
+                if not new_key in dir_defs:
+                    dir_defs[new_key] = val
+            break
+
+        make_line = make_file.readline()
+    return val
+
+
+if len(infile) == 0:
+#    ffile = open("applications\\einstein_2_cpu_1\\Makefile", "r")
+    make_file = open("build\\scripts\\monet.mak", "r")
+    count = 1;
+
+#    make_lines = make_file.readlines()
+#    make_file.seek(0,0)
+    make_line = make_file.readline()
+    while make_line:
+        if "CORE1_SRC_FILES" in make_line[:15] or "CORE0_SRC_FILES" in make_line[:15]:
+            src_filename = make_line.split()[-1:][0]
+
+            # Get the $() directory reference at the beginning of the src file
+            new_key = src_filename.split(")")[:1][0][2:]
+
+            if not new_key in dir_defs:
+                print new_key
+                dir_defs[new_key] = ""
+            src_filename = src_filename.split('$')[-1:][0]
+            src_filename = src_filename.replace('(PACKAGES_DIR)', 'packages')
+            src_filename = src_filename.replace('(CHIP_BSP_FOLDER)', 'bsp/einstein_2')
+            print src_filename 
+        make_line = make_file.readline()
+
+
+    dir_defs_keys =  dir_defs.keys()
+    print dir_defs_keys
+
+    # for all the top level dir references, search the make file again for the definition
+    for find_key in dir_defs_keys:
+
+        # Skip if there is a value for the key, lookup more $() references later
+        if dir_defs[find_key] != "":
+            continue
+
+        dir_defs[find_key] = find_definition_in_makefile(make_file, find_key)
+
+#this part s/b seperate function, returnning a value for a given key
+#end of seperate function
+
+    # Next, go through the values of all dir references, looking for further references ($)
+    for find_key in dir_defs_keys:
+        if "$" in dir_defs[find_key]:
+            print dir_defs[find_key]
+            new_key = dir_defs[find_key].split(")")[:1][0][2:]
+            if new_key in dir_defs and dir_defs[new_key] != "" and not "$" in dir_defs[new_key]:
+                dir_defs[find_key] = dir_defs[find_key].replace('$(' + new_key + ')', dir_defs[new_key])
+            else:
+                new_val = find_definition_in_makefile(make_file, new_key)
+                print new_key, new_val
+
+#    for x in range(1,450):
+#        srcfile = parsemake(ffile)
+#        if len(srcfile) > 0:
+#            count += len(parsefile(srcfile, count))
+
+    print dir_defs
+
+    make_file.close()
+else:
+    R = parsefile(infile, 0)
+    sel = raw_input('> ')
+    if sel.isdigit():
+        tempdir = os.environ['TEMP']
+        ffile = open(tempdir + '\\functemp', 'w')
+        ffile.write(R[int(sel)][0])
+        ffile.close()

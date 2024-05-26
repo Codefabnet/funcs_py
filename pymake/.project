@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>pymake</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.python.pydev.PyDevBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.python.pydev.pythonNature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>fparse.py</name>
+			<type>1</type>
+			<location>C:/dev/scripts/pymake/fparse.py</location>
+		</link>
+		<link>
+			<name>funcs.py</name>
+			<type>1</type>
+			<location>C:/dev/scripts/pymake/funcs.py</location>
+		</link>
+		<link>
+			<name>getfiles.py</name>
+			<type>1</type>
+			<location>C:/dev/scripts/pymake/getfiles.py</location>
+		</link>
+		<link>
+			<name>makefile_parser.py</name>
+			<type>1</type>
+			<location>C:/dev/scripts/pymake/makefile_parser.py</location>
+		</link>
+	</linkedResources>
+</projectDescription>
