@@ -59,9 +59,9 @@ class makefile_parser:
                 make_file.seek(make_file_pos, 0)
                 src_filename = src_filename.replace('$(' + new_key + ')', new_val)
                 if not os.path.isfile(src_filename):
-                    print src_filename, "is not a file!"
+                    print (src_filename, "is not a file!")
                 if len(src_filename) > 0:
-                    print src_filename
+                    print (src_filename)
                     self.files_func_dir[src_filename] = getfuncs(src_filename, 0, 0) 
                 
             make_line = make_file.readline()
@@ -164,9 +164,9 @@ def getfuncs(ffile, fprint, sort):
     if sort == 1:
         func_desc_list.sort()
     if fprint == 1:
-        print 'index', '\t', 'line', '\t',  'function' 
+        print ('index', '\t', 'line', '\t',  'function' )
         for x in range(len(func_desc_list)):
-            print str(x) + ':', '\t', func_desc_list[x][2], ' - ', func_desc_list[x][3], '\t', func_desc_list[x][0] 
+            print (str(x) + ':', '\t', func_desc_list[x][2], ' - ', func_desc_list[x][3], '\t', func_desc_list[x][0] )
     return func_desc_list
 
 def findcalls(func):
@@ -175,7 +175,7 @@ def findcalls(func):
     for func_desc in func_list:
         if func == func_desc[0]:
 
-            print func, func_desc
+            print (func, func_desc)
             ffile = open(func_desc[1], "r")
             count = 0
             while count < int(func_desc[2]):
@@ -186,13 +186,13 @@ def findcalls(func):
             while src_line and count < int(func_desc[3]):
 
 
-                print "\n------------", src_line
+                print ("\n------------", src_line)
                 if "//" in src_line:
                     src_line = src_line.split("//")[:-1][0] 
-#                    print "removed '//'\n", src_line
+#                    print ("removed '//'\n", src_line)
 
                 if len(src_line) == 0:
-#                    print "skip"
+#                    print ("skip")
                     count += 1
                     continue
 
@@ -202,7 +202,7 @@ def findcalls(func):
                     if count >= int(func_desc[3]):
                         src_line = src_line[:src_line.rfind("}")+1]
                         break
-                print src_line
+                print (src_line)
 
 
 
@@ -218,19 +218,19 @@ def findcalls(func):
                     caller_list = [x.strip() for x in calls if not x.isspace()]
 #                    if len(caller_list) != 0:
 #                        caller = caller_list[0]
-                    print caller_list, "\n", calls
+                    print (caller_list, "\n", calls)
                     for caller in caller_list:
 #                    caller = [x for x in calls if not x.isspace()]
 #                        if "if" in caller or "sizeof" in caller or "while" in caller or caller.isspace():
                         if caller.isspace() or caller[-1:] == "=" or caller[-1:] == "," or caller[-1:] == "~":
                             caller_list.remove(caller)
-                        print caller
+                        print (caller)
                         for exclude in excludes:
                             if exclude in caller:
                                 caller_list.remove(caller)
 
                     for caller in caller_list:
-                        print count+1, len(caller), caller
+                        print (count+1, len(caller), caller)
 
                 count += 1
                 src_line = ffile.readline().strip()
@@ -308,16 +308,16 @@ def listref(func_ref_list, func_name, ftype):
         if ftype == 0:  # ctype
 #            if func == func_name: 
             if func_ref_list[x][3] == func_name: 
-                print '\ndefined here:' 
-                print str(x) + ':', func_ref_list[x][1], func_ref_list[x][0], '\t', func_ref_list[x][2].strip(), '\n' 
+                print ('\ndefined here:' )
+                print (str(x) + ':', func_ref_list[x][1], func_ref_list[x][0], '\t', func_ref_list[x][2].strip(), '\n' )
             else:
 #                print str(x) + ':', 'called in', func_ref_list[x][0], ': line', func_ref_list[x][1], ':', func+'()', 'function:'
-                print str(x) + ':', 'called in', func_ref_list[x][0], ': line', func_ref_list[x][1], ':', func_ref_list[x][3]+'()', 'function:'
-                print '\t', func_ref_list[x][2].strip(), '\n'
+                print (str(x) + ':', 'called in', func_ref_list[x][0], ': line', func_ref_list[x][1], ':', func_ref_list[x][3]+'()', 'function:')
+                print ('\t', func_ref_list[x][2].strip(), '\n')
 #                func_ref_list[x].append(func)
         else:
-            print str(x) + ':', 'ref in header file,', func_ref_list[x][0], ': line', func_ref_list[x][1]
-            print '\t', func_ref_list[x][2].strip(), '\n'
+            print ((str(x) + ':', 'ref in header file,', func_ref_list[x][0], ': line', func_ref_list[x][1]))
+            print ('\t', func_ref_list[x][2].strip(), '\n')
 
 
 def findinsym(refobj):

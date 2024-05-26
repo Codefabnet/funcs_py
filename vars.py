@@ -33,7 +33,7 @@ sfunc = '%'
 sline = '0'
 
 def print_debug():
-     print
+     print()
 #     print
 #     print "depth = " , depth
 #     print "func = "  , func
@@ -44,9 +44,9 @@ def print_debug():
 #         print x
      idx = 0
      for idx in range(len(stack)):
-         print " " * idx * 2, stack[len(stack)-idx-1][2]
-         print " " * idx * 2, "  |" 
-     print " " * idx * 2, " ", func
+         print (" " * idx * 2, stack[len(stack)-idx-1][2])
+         print (" " * idx * 2, "  |") 
+     print (" " * idx * 2, " ", func)
 
 
 if len(sys.argv) == 2:
@@ -98,7 +98,7 @@ if len(sys.argv) == 2:
                 listref(func_ref_list, func, ctype)
 
         if inp[0] == 'F':
-            print inp[1:]
+            print (inp[1:])
 #            sfile = func_ref_list[int(inp[1:])][0]
 #            sline = func_ref_list[int(inp[1:])][1]
 #            sfunc = func_ref_list[int(inp[1:])][3]
@@ -137,41 +137,41 @@ if len(sys.argv) == 2:
         if inp[0] == 'h':
             # find where the function is referenced in the source tree
             func_ref_list = finduse(func, htype)
-            print len(func_ref_list)
+            print (len(func_ref_list))
             # print and indexed list of references
             listref(func_ref_list, func, htype)
 
         if inp[0] == 'c':
             # find where the function is referenced in the source tree
             func_ref_list = finduse(func, ctype)
-            print len(func_ref_list)
+            print (len(func_ref_list))
             # print and indexed list of references
             listref(func_ref_list, func, ctype)
 
         if inp[0] == 's':
             # find where the function is referenced in the source tree
             func_ref_list = finduse(func, stype)
-            print len(func_ref_list)
+            print (len(func_ref_list))
             # print and indexed list of references
             listref(func_ref_list, func, ctype)
 
         if inp[0] == 'g':
             # find where the function is referenced in the source tree
             func_ref_list = finduse(func, diagsonly)
-            print len(func_ref_list)
+            print (len(func_ref_list))
             # print and indexed list of references
             listref(func_ref_list, func, ctype)
 
-        print
-        print
+        print()
+        print()
         # user selects a reference location
         inp = raw_input('> ')
 
 #    print depth
     stack.reverse()
     for x in stack[:]:
-        print x[2]
-    print func
+        print (x[2])
+    print (func)
 
 
 
