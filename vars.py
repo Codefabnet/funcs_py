@@ -9,6 +9,7 @@ finduse = fparse.finduse
 listref = fparse.listref
 
 inval = sys.argv[1:2]
+#inval = sys.argv[1]
 
 
 ctype = 0

@@ -107,9 +107,9 @@ mparser = makefile_parser()
 def subcall(fcall, fpar):
     "function to call subprocess Popen"
 
-#    print 'fparse.py, subcall', fcall, fpar
-    p = subprocess.Popen([fcall,  fpar], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    out, err = p.communicate()
+    print ('fparse.py, subcall', fcall, fpar)
+    p = subprocess.Popen(["grep",  "add_single_node", "llist.c"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = p.communicate(timeout = 10)
     lines_out = out.splitlines()
     return lines_out
 
@@ -258,15 +258,16 @@ def finduse(func_name, flags):
         grepopt = ' -IRnw --include=*.h '
         filepat = ' ./*'
     elif flags == ctype:
-        grepopt = ' -IRnw --include=*.c '
+        grepopt = ' -Irnw --include=*.c '
         filepat = ' ./*'
     elif (flags & nodiags) == nodiags:
-        grepopt = ' -IRnw --include=*.c --exclude-dir=diags '
+        grepopt = ' -Irnw --include=*.c --exclude-dir=diags '
         filepat = ' ./*'
     elif (flags & nodiags) == diags:
-        grepopt = ' -IRnw --include=*.c '
+        grepopt = ' -Irnw --include=*.c '
         filepat = ' ./diags\\cpu_1\\*'
-    func_grep_list = subcall('grep', [grepopt + func_name + filepat])
+    func_grep_list = subcall('grep', [grepopt, func_name, filepat])
+#    func_grep_list = subcall('grep', '-Inw, --include=*.c, //home//spb//temp//practice//funcs_py//*.c')
     func_ref_list=[func_grep_list[x].split(':') for x in range(len(func_grep_list))]
 
     for func_ref in func_ref_list[:]:
