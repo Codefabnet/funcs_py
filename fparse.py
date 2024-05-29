@@ -109,7 +109,7 @@ def subcall(fcall, fpar):
 
     print ('fparse.py, subcall', fcall, fpar)
     fcall.extend(fpar)
-    p = subprocess.Popen(" ".join(fcall), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    p = subprocess.Popen(fcall, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 #    p = subprocess.Popen(["grep",  "add_single_node", "llist.c"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate(timeout = 10)
     print (err)
@@ -160,7 +160,8 @@ def getfuncs(ffile, fprint, sort):
             files_func_dir = json.load(json_obj_file)
         func_desc_list = files_func_dir[ffile] 
     else:
-        func_tags_list = subcall(['./pu.sh'],  ['llist.c'])
+#        func_tags_list = subcall(['./pu.sh'],  ['llist.c'])
+        func_tags_list = subcall(['ctags'],  ['llist.c'])
         func_desc_list = [func_tags_list[x].split() for x in range(len(func_tags_list))]
         func_desc_list = get_end_of_func(func_desc_list, ffile)
 
