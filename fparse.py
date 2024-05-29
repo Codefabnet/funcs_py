@@ -109,7 +109,7 @@ def subcall(fcall, fpar):
 
     print ('fparse.py, subcall', fcall, fpar)
     fcall.extend(fpar)
-    p = subprocess.Popen(fcall, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(" ".join(fcall), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 #    p = subprocess.Popen(["grep",  "add_single_node", "llist.c"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate(timeout = 10)
     print (err)
