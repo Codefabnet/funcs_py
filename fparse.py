@@ -108,8 +108,11 @@ def subcall(fcall, fpar):
     "function to call subprocess Popen"
 
     print ('fparse.py, subcall', fcall, fpar)
-    p = subprocess.Popen(["grep",  "add_single_node", "llist.c"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    fcall.extend(fpar)
+    p = subprocess.Popen(fcall, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+#    p = subprocess.Popen(["grep",  "add_single_node", "llist.c"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = p.communicate(timeout = 10)
+    print (err)
     lines_out = out.splitlines()
     return lines_out
 
@@ -157,7 +160,7 @@ def getfuncs(ffile, fprint, sort):
             files_func_dir = json.load(json_obj_file)
         func_desc_list = files_func_dir[ffile] 
     else:
-        func_tags_list = subcall('pu.bat',  ffile)
+        func_tags_list = subcall(['./pu.sh'],  ['llist.c'])
         func_desc_list = [func_tags_list[x].split() for x in range(len(func_tags_list))]
         func_desc_list = get_end_of_func(func_desc_list, ffile)
 
@@ -266,12 +269,15 @@ def finduse(func_name, flags):
     elif (flags & nodiags) == diags:
         grepopt = ' -Irnw --include=*.c '
         filepat = ' ./diags\\cpu_1\\*'
-    func_grep_list = subcall('grep', [grepopt, func_name, filepat])
+    func_grep_list = subcall(['grep'], ["-Irnw", "--include=*.c", func_name])
+#    func_grep_list = subcall('grep', [grepopt, func_name, filepat])
 #    func_grep_list = subcall('grep', '-Inw, --include=*.c, //home//spb//temp//practice//funcs_py//*.c')
-    func_ref_list=[func_grep_list[x].split(':') for x in range(len(func_grep_list))]
+    func_ref_list=[str(func_grep_list[x]).split(':') for x in range(len(func_grep_list))]
+#    func_ref_list=[func_grep_list[x] for x in range(len(func_grep_list))]
 
     for func_ref in func_ref_list[:]:
 #        print 'fparse.py, finduse', func_ref
+        print (func_ref)
         # remove commented out code
         if '//' in func_ref[2]:
             if func_ref[2].find('//') < func_ref[2].find(func_name):
