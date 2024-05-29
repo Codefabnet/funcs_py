@@ -1,4 +1,7 @@
 *.zip
 /pymake/dell_work/
 *.*~
+__pycache__/
+tags
+llist.c
 
