@@ -59,7 +59,7 @@ if len(sys.argv) == 2:
     listref(func_ref_list, func, ctype)
 
     # user selects a reference location
-    inp = raw_input('> ')
+    inp = input('> ')
 #    print inp[0]
 #    print inp[1:]
     while len(inp) != 0 and \
@@ -166,7 +166,7 @@ if len(sys.argv) == 2:
         print()
         print()
         # user selects a reference location
-        inp = raw_input('> ')
+        inp = input('> ')
 
 #    print depth
     stack.reverse()
