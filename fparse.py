@@ -1,3 +1,4 @@
+import platform
 import subprocess
 import json
 import os
@@ -160,8 +161,10 @@ def getfuncs(ffile, fprint, sort):
             files_func_dir = json.load(json_obj_file)
         func_desc_list = files_func_dir[ffile] 
     else:
-#        func_tags_list = subcall(['./pu.sh'],  ['llist.c'])
-        func_tags_list = subcall(['ctags'],  ['llist.c'])
+        if platform.python_version() == "3.8.10":
+            func_tags_list = subcall(['./pu.sh'],  [ffile])
+        else:
+            func_tags_list = subcall(['/usr/bin/ctags'],  [ffile])
         func_desc_list = [func_tags_list[x].split() for x in range(len(func_tags_list))]
         func_desc_list = get_end_of_func(func_desc_list, ffile)
 
@@ -273,7 +276,8 @@ def finduse(func_name, flags):
     func_grep_list = subcall(['grep'], ["-Irnw", "--include=*.c", func_name])
 #    func_grep_list = subcall('grep', [grepopt, func_name, filepat])
 #    func_grep_list = subcall('grep', '-Inw, --include=*.c, //home//spb//temp//practice//funcs_py//*.c')
-    func_ref_list=[str(func_grep_list[x]).split(':') for x in range(len(func_grep_list))]
+#    func_ref_list=[str(func_grep_list[x]).split(':') for x in range(len(func_grep_list))]
+    func_ref_list=[func_grep_list[x].decode('UTF-8').split(':') for x in range(len(func_grep_list))]
 #    func_ref_list=[func_grep_list[x] for x in range(len(func_grep_list))]
 
     for func_ref in func_ref_list[:]:
@@ -319,8 +323,12 @@ def listref(func_ref_list, func_name, ftype):
                 print ('\ndefined here:' )
                 print (str(x) + ':', func_ref_list[x][1], func_ref_list[x][0], '\t', func_ref_list[x][2].strip(), '\n' )
             else:
+                print(platform.python_version())
 #                print str(x) + ':', 'called in', func_ref_list[x][0], ': line', func_ref_list[x][1], ':', func+'()', 'function:'
-                print (str(x) + ':', 'called in', func_ref_list[x][0], ': line', func_ref_list[x][1], ':', func_ref_list[x][3]+'()', 'function:')
+                if platform.python_version() == "3.8.10":
+                    print (str(x) + ':', 'called in', func_ref_list[x][0], ': line', func_ref_list[x][1], ':', func_ref_list[x][3].decode('UTF-8')+'()', 'function:')
+                else:
+                    print (str(x) + ':', 'called in', func_ref_list[x][0], ': line', func_ref_list[x][1], ':', func_ref_list[x][3]+'()', 'function:')
                 print ('\t', func_ref_list[x][2].strip(), '\n')
 #                func_ref_list[x].append(func)
         else:
