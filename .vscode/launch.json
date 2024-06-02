@@ -10,7 +10,8 @@
             "request": "launch",
             "program": "vars.py",
             "console": "integratedTerminal",
-            "args": "add_single_node"
+            "args": "add_single_node",
+            "justMyCode": false
         }
     ]
 }
