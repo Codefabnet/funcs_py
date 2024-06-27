@@ -1,5 +1,6 @@
 *.zip
-/pymake/dell_work/
+dell_work
+*.mks
 *.*~
 __pycache__/
 tags
